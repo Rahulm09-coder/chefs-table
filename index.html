@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chef's Table API</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #000;
+            color: #fff;
+            font-family: 'Georgia', serif;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #c9a84c;
+            margin-bottom: 30px;
+            letter-spacing: 3px;
+        }
+
+        .api-section {
+            background: #0a0a0a;
+            border: 1px solid #333;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+
+        .api-section h2 {
+            color: #c9a84c;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background: #c9a84c;
+            border: none;
+            color: #000;
+            cursor: pointer;
+            border-radius: 4px;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #d4b86e;
+        }
+
+        input {
+            padding: 10px;
+            background: #111;
+            border: 1px solid #333;
+            color: #fff;
+            border-radius: 4px;
+            font-family: 'Georgia', serif;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #c9a84c;
+        }
+
+        .response {
+            background: #111;
+            border-left: 3px solid #c9a84c;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 4px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-size: 0.9rem;
+        }
+
+        .recipe-card {
+            background: #111;
+            border: 1px solid #333;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(201, 168, 76, 0.1);
+        }
+
+        .recipe-card h3 {
+            color: #c9a84c;
+            margin-bottom: 10px;
+        }
+
+        .recipe-card p {
+            color: #888;
+            margin: 5px 0;
+            font-size: 0.9rem;
+        }
+
+        .recipe-card .meta {
+            display: flex;
+            gap: 20px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .recipe-card .meta-item {
+            color: #666;
+            font-size: 0.85rem;
+        }
+
+        .meta-item strong {
+            color: #c9a84c;
+        }
+
+        .error {
+            color: #ff6b6b;
+            background: #3d1a1a;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+
+        .success {
+            color: #4caf50;
+            background: #1a3d1a;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+
+        .loading {
+            text-align: center;
+            color: #c9a84c;
+        }
+
+        .json-display {
+            background: #000;
+            color: #0f0;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            white-space: pre-wrap;
+            word-break: break-all;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #c9a84c;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .api-section {
+                padding: 15px;
+            }
+
+            button {
+                font-size: 0.9rem;
+                padding: 8px 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>🍽️ Chef's Table REST API</h1>
+
+        <!-- Get All Recipes -->
+        <div class="api-section">
+            <h2>📖 Get All Recipes</h2>
+            <button onclick="getAllRecipes()">Get All Recipes</button>
+            <div id="allRecipesResponse"></div>
+        </div>
+
+        <!-- Search Recipes -->
+        <div class="api-section">
+            <h2>🔍 Search Recipes</h2>
+            <div class="form-group">
+                <label>Search Query</label>
+                <input type="text" id="searchQuery" placeholder="e.g., pizza, indian, salad..." value="pizza">
+            </div>
+            <button onclick="searchRecipes()">Search</button>
+            <div id="searchResponse"></div>
+        </div>
+
+        <!-- Get Single Recipe -->
+        <div class="api-section">
+            <h2>📋 Get Recipe by ID</h2>
+            <div class="form-group">
+                <label>Recipe ID</label>
+                <input type="number" id="recipeId" placeholder="Enter recipe ID (1-8)" value="1" min="1" max="8">
+            </div>
+            <button onclick="getRecipeById()">Get Recipe</button>
+            <div id="recipeResponse"></div>
+        </div>
+
+        <!-- Detect Recipe from Image -->
+        <div class="api-section">
+            <h2>📷 Detect Recipe from Image</h2>
+            <div class="form-group">
+                <label>Upload Image</label>
+                <input type="file" id="imageFile" accept="image/*">
+            </div>
+            <button onclick="detectRecipe()">Detect Recipe</button>
+            <div id="detectResponse"></div>
+        </div>
+
+        <!-- Health Check -->
+        <div class="api-section">
+            <h2>❤️ Health Check</h2>
+            <button onclick="healthCheck()">Check API Status</button>
+            <div id="healthResponse"></div>
+        </div>
+
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5000/api';
+
+        function displayResponse(elementId, data, isError = false) {
+            const element = document.getElementById(elementId);
+            if (isError) {
+                element.innerHTML = `<div class="error">${data}</div>`;
+            } else if (Array.isArray(data)) {
+                element.innerHTML = data.map(recipe => `
+                    <div class="recipe-card">
+                        <h3>${recipe.emoji} ${recipe.name}</h3>
+                        <p>${recipe.description}</p>
+                        <div class="meta">
+                            <div class="meta-item"><strong>Cuisine:</strong> ${recipe.cuisine}</div>
+                            <div class="meta-item"><strong>Category:</strong> ${recipe.category}</div>
+                            <div class="meta-item"><strong>Rating:</strong> ⭐ ${recipe.rating}</div>
+                            <div class="meta-item"><strong>Calories:</strong> 🔥 ${recipe.calories} kcal</div>
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                element.innerHTML = `
+                    <div class="response">
+                        <div class="json-display">${JSON.stringify(data, null, 2)}</div>
+                    </div>
+                `;
+            }
+        }
+
+        function getAllRecipes() {
+            const element = document.getElementById('allRecipesResponse');
+            element.innerHTML = '<div class="loading">Loading...</div>';
+
+            fetch(`${API_URL}/recipes`)
+                .then(res => res.json())
+                .then(data => displayResponse('allRecipesResponse', data))
+                .catch(err => displayResponse('allRecipesResponse', `Error: ${err.message}`, true));
+        }
+
+        function searchRecipes() {
+            const query = document.getElementById('searchQuery').value;
+            if (!query) {
+                displayResponse('searchResponse', 'Please enter a search query', true);
+                return;
+            }
+
+            const element = document.getElementById('searchResponse');
+            element.innerHTML = '<div class="loading">Searching...</div>';
+
+            fetch(`${API_URL}/search?q=${encodeURIComponent(query)}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.results) {
+                        displayResponse('searchResponse', data.results);
+                    } else {
+                        displayResponse('searchResponse', data.error, true);
+                    }
+                })
+                .catch(err => displayResponse('searchResponse', `Error: ${err.message}`, true));
+        }
+
+        function getRecipeById() {
+            const id = document.getElementById('recipeId').value;
+            if (!id) {
+                displayResponse('recipeResponse', 'Please enter a recipe ID', true);
+                return;
+            }
+
+            const element = document.getElementById('recipeResponse');
+            element.innerHTML = '<div class="loading">Loading...</div>';
+
+            fetch(`${API_URL}/recipe/${id}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.id) {
+                        displayResponse('recipeResponse', [data]);
+                    } else {
+                        displayResponse('recipeResponse', data.error, true);
+                    }
+                })
+                .catch(err => displayResponse('recipeResponse', `Error: ${err.message}`, true));
+        }
+
+        function detectRecipe() {
+            const fileInput = document.getElementById('imageFile');
+            if (!fileInput.files.length) {
+                displayResponse('detectResponse', 'Please select an image', true);
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('image', fileInput.files[0]);
+
+            const element = document.getElementById('detectResponse');
+            element.innerHTML = '<div class="loading">Detecting recipe...</div>';
+
+            fetch(`${API_URL}/detect`, {
+                method: 'POST',
+                body: formData
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.detected) {
+                        displayResponse('detectResponse', [data.recipe]);
+                    } else {
+                        displayResponse('detectResponse', `Detection failed: ${data.error}`, true);
+                    }
+                })
+                .catch(err => displayResponse('detectResponse', `Error: ${err.message}`, true));
+        }
+
+        function healthCheck() {
+            const element = document.getElementById('healthResponse');
+            element.innerHTML = '<div class="loading">Checking...</div>';
+
+            fetch(`${API_URL}/health`)
+                .then(res => res.json())
+                .then(data => displayResponse('healthResponse', data))
+                .catch(err => displayResponse('healthResponse', `Error: ${err.message}`, true));
+        }
+    </script>
+
+</body>
+
+</html>

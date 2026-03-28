@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ingredient Finder - Chef's Table</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #000; color: #fff; font-family: 'Georgia', serif; min-height: 100vh; padding-bottom: 80px; }
+        nav { display: flex; justify-content: space-between; align-items: center; padding: 20px 60px; border-bottom: 1px solid #333; }
+        .logo { font-size: 1.8rem; font-weight: bold; letter-spacing: 3px; text-transform: uppercase; text-decoration: none; color: #fff; }
+        .logo span { color: #c9a84c; }
+        .nav-right a { color: #ccc; text-decoration: none; font-size: 0.85rem; letter-spacing: 1px; text-transform: uppercase; margin-left: 30px; transition: color 0.3s; }
+        .nav-right a:hover { color: #c9a84c; }
+
+        .hero { background: radial-gradient(ellipse at center, #0a1f0a 0%, #000 70%); padding: 50px 20px; text-align: center; border-bottom: 1px solid #1a3a1a; }
+        .hero h2 { font-size: 2.2rem; letter-spacing: 5px; text-transform: uppercase; color: #4caf50; }
+        .hero p { color: #888; margin-top: 10px; letter-spacing: 2px; font-size: 0.9rem; }
+
+        .container { padding: 40px 60px; max-width: 1000px; margin: 0 auto; }
+
+        .search-box { background: #0a0a0a; border: 1px solid #1a3a1a; padding: 30px; margin-bottom: 40px; }
+        .search-box h3 { font-size: 1rem; letter-spacing: 3px; text-transform: uppercase; color: #4caf50; margin-bottom: 15px; }
+        .search-box p { color: #666; font-size: 0.85rem; margin-bottom: 20px; line-height: 1.6; }
+        .input-row { display: flex; gap: 0; }
+        .input-row input { flex: 1; padding: 14px 20px; background: #111; border: 1px solid #333; border-right: none; color: #fff; font-size: 1rem; font-family: 'Georgia', serif; outline: none; }
+        .input-row input:focus { border-color: #4caf50; }
+        .input-row button { padding: 14px 30px; background: #4caf50; border: none; color: #fff; font-weight: bold; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: background 0.3s; font-family: 'Georgia', serif; }
+        .input-row button:hover { background: #43a047; }
+
+        .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 15px; }
+        .chip { padding: 5px 14px; background: #111; border: 1px solid #1a3a1a; color: #4caf50; font-size: 0.78rem; letter-spacing: 1px; border-radius: 20px; cursor: pointer; transition: all 0.2s; }
+        .chip:hover { background: #1a3a1a; }
+
+        .results-header { font-size: 0.85rem; color: #888; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 20px; }
+        .results-header span { color: #4caf50; }
+
+        .result-card { background: #0a0a0a; border: 1px solid #1a3a1a; padding: 25px; margin-bottom: 20px; display: flex; gap: 20px; align-items: flex-start; transition: border 0.3s; }
+        .result-card:hover { border-color: #4caf50; }
+        .result-emoji { font-size: 3rem; flex-shrink: 0; }
+        .result-body { flex: 1; }
+        .result-body h4 { font-size: 1rem; letter-spacing: 2px; text-transform: uppercase; color: #fff; margin-bottom: 6px; }
+        .result-body p { color: #777; font-size: 0.85rem; line-height: 1.5; margin-bottom: 12px; }
+        .match-bar-wrap { margin-bottom: 10px; }
+        .match-label { font-size: 0.75rem; color: #888; letter-spacing: 1px; margin-bottom: 5px; }
+        .match-bar { height: 6px; background: #1a1a1a; border-radius: 3px; overflow: hidden; }
+        .match-fill { height: 100%; background: #4caf50; border-radius: 3px; }
+        .matched-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+        .matched-tag { padding: 3px 10px; background: #0d2a0d; border: 1px solid #4caf50; color: #4caf50; font-size: 0.72rem; letter-spacing: 1px; }
+        .missing-tag { padding: 3px 10px; background: #1a1a1a; border: 1px solid #333; color: #555; font-size: 0.72rem; letter-spacing: 1px; }
+        .result-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+        .btn-view { padding: 8px 20px; background: #4caf50; border: none; color: #fff; font-size: 0.8rem; text-decoration: none; letter-spacing: 1px; text-transform: uppercase; transition: background 0.3s; display: inline-block; }
+        .btn-view:hover { background: #43a047; }
+        .btn-plan { padding: 8px 20px; background: transparent; border: 1px solid #c9a84c; color: #c9a84c; font-size: 0.8rem; text-decoration: none; letter-spacing: 1px; text-transform: uppercase; transition: all 0.3s; display: inline-block; }
+        .btn-plan:hover { background: #c9a84c; color: #000; }
+
+        .no-results { text-align: center; padding: 60px 20px; color: #444; }
+        .no-results .icon { font-size: 4rem; margin-bottom: 20px; }
+        .no-results p { letter-spacing: 2px; font-size: 0.9rem; }
+
+        footer { text-align: center; padding: 30px; border-top: 1px solid #222; color: #555; font-size: 0.8rem; letter-spacing: 1px; margin-top: 40px; }
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #111; border-top: 1px solid #333; display: flex; justify-content: space-around; align-items: center; padding: 12px 0; z-index: 999; }
+        .bottom-nav a { display: flex; flex-direction: column; align-items: center; gap: 5px; text-decoration: none; color: #777; font-size: 0.65rem; letter-spacing: 1px; text-transform: uppercase; transition: color 0.3s; }
+        .bottom-nav a:hover, .bottom-nav a.active { color: #4caf50; }
+        .bottom-nav .icon { font-size: 1.6rem; }
+
+        @media (max-width: 768px) {
+            .container { padding: 30px 20px; }
+            nav { padding: 15px 20px; }
+            .result-card { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <a href="/" class="logo">Chef<span>'s</span> Table</a>
+    <div class="nav-right">
+        <a href="/dashboard">Dashboard</a>
+        <a href="/veg">Recipes</a>
+        <a href="/meal-planner">Meal Planner</a>
+        <a href="/">Logout</a>
+    </div>
+</nav>
+
+<div class="hero">
+    <h2>🥦 What's In My <span style="color:#fff;">Fridge?</span></h2>
+    <p>Enter ingredients you have — we'll find recipes you can make right now</p>
+</div>
+
+<div class="container">
+    <div class="search-box">
+        <h3>Enter Your Ingredients</h3>
+        <p>Type ingredients separated by commas. Example: <em style="color:#4caf50;">paneer, tomato, butter</em></p>
+        <form method="GET">
+            <div class="input-row">
+                <input type="text" name="ingredients" id="ingredientInput"
+                    value="{{ user_ingredients }}"
+                    placeholder="e.g. paneer, tomato, noodles, chickpeas..." required>
+                <button type="submit">Find Recipes</button>
+            </div>
+        </form>
+        <div class="chips">
+            <span style="color:#555; font-size:0.78rem; align-self:center;">Quick add:</span>
+            {% for ing in ['Paneer', 'Tomato', 'Noodles', 'Chickpeas', 'Butter', 'Lentils', 'Lettuce', 'Chocolate'] %}
+            <span class="chip" onclick="addIngredient('{{ ing }}')">+ {{ ing }}</span>
+            {% endfor %}
+        </div>
+    </div>
+
+    {% if user_ingredients %}
+        {% if results %}
+        <div class="results-header">Found <span>{{ results|length }}</span> recipe(s) matching your ingredients</div>
+        {% for item in results %}
+        <div class="result-card">
+            <div class="result-emoji">{{ item.recipe.emoji }}</div>
+            <div class="result-body">
+                <h4>{{ item.recipe.name }}</h4>
+                <p>{{ item.recipe.description }}</p>
+                <div class="match-bar-wrap">
+                    <div class="match-label">Ingredient match: {{ item.match_count }}/{{ item.total }}</div>
+                    <div class="match-bar">
+                        <div class="match-fill" style="width: {{ (item.match_count / item.total * 100)|int }}%"></div>
+                    </div>
+                </div>
+                <div class="matched-tags">
+                    {% for ing in item.ing_status %}
+                        {% if ing.matched %}
+                        <span class="matched-tag">✓ {{ ing.name }}</span>
+                        {% else %}
+                        <span class="missing-tag">{{ ing.name }}</span>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <div class="result-actions">
+                    <a href="/recipe/{{ item.recipe.id }}" class="btn-view">View Recipe</a>
+                    <a href="/meal-planner" class="btn-plan">📅 Add to Plan</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="no-results">
+            <div class="icon">🔍</div>
+            <p>No recipes found with those ingredients.<br>Try different or more ingredients.</p>
+        </div>
+        {% endif %}
+    {% endif %}
+</div>
+
+<footer>&copy; 2025 Chef's Table. All rights reserved.</footer>
+
+<div class="bottom-nav">
+    <a href="/dashboard"><span class="icon">🏠</span><span>Home</span></a>
+    <a href="/meal-planner"><span class="icon">📅</span><span>Planner</span></a>
+    <a href="/detect"><span class="icon">📷</span><span>Camera</span></a>
+    <a href="/ingredient-finder" class="active"><span class="icon">🥦</span><span>Fridge</span></a>
+</div>
+
+<script>
+    function addIngredient(ing) {
+        const input = document.getElementById('ingredientInput');
+        const val = input.value.trim();
+        input.value = val ? val + ', ' + ing : ing;
+        input.focus();
+    }
+</script>
+
+</body>
+</html>

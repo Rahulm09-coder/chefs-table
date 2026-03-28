@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meal Planner - Chef's Table</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #000; color: #fff; font-family: 'Georgia', serif; min-height: 100vh; padding-bottom: 80px; }
+        nav { display: flex; justify-content: space-between; align-items: center; padding: 20px 60px; border-bottom: 1px solid #333; }
+        .logo { font-size: 1.8rem; font-weight: bold; letter-spacing: 3px; text-transform: uppercase; text-decoration: none; color: #fff; }
+        .logo span { color: #c9a84c; }
+        .nav-right a { color: #ccc; text-decoration: none; font-size: 0.85rem; letter-spacing: 1px; text-transform: uppercase; margin-left: 30px; transition: color 0.3s; }
+        .nav-right a:hover { color: #c9a84c; }
+
+        .hero { background: radial-gradient(ellipse at center, #1a1200 0%, #000 70%); padding: 50px 20px; text-align: center; border-bottom: 1px solid #2a2000; }
+        .hero h2 { font-size: 2.2rem; letter-spacing: 5px; text-transform: uppercase; color: #c9a84c; }
+        .hero p { color: #888; margin-top: 10px; letter-spacing: 2px; font-size: 0.9rem; }
+
+        .container { padding: 40px 60px; }
+
+        /* Calorie Budget Bar */
+        .budget-section { background: #0a0a0a; border: 1px solid #2a2000; padding: 25px 30px; margin-bottom: 40px; }
+        .budget-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; }
+        .budget-header h3 { font-size: 1rem; letter-spacing: 3px; text-transform: uppercase; color: #c9a84c; }
+        .budget-input { display: flex; align-items: center; gap: 10px; }
+        .budget-input input { background: #111; border: 1px solid #444; color: #fff; padding: 8px 14px; font-size: 0.9rem; width: 100px; font-family: 'Georgia', serif; }
+        .budget-input label { color: #888; font-size: 0.85rem; }
+        .progress-bar { height: 12px; background: #1a1a1a; border-radius: 6px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #4caf50, #c9a84c); border-radius: 6px; transition: width 0.5s; }
+        .progress-fill.over { background: linear-gradient(90deg, #c9a84c, #e53935); }
+        .budget-stats { display: flex; gap: 30px; margin-top: 12px; flex-wrap: wrap; }
+        .budget-stat { font-size: 0.85rem; }
+        .budget-stat span { color: #c9a84c; font-weight: bold; }
+
+        /* Add to Plan Form */
+        .add-form { background: #0a0a0a; border: 1px solid #222; padding: 25px 30px; margin-bottom: 40px; }
+        .add-form h3 { font-size: 1rem; letter-spacing: 3px; text-transform: uppercase; color: #c9a84c; margin-bottom: 20px; }
+        .form-row { display: flex; gap: 15px; flex-wrap: wrap; align-items: flex-end; }
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .form-group label { color: #888; font-size: 0.78rem; letter-spacing: 1px; text-transform: uppercase; }
+        .form-group select { background: #111; border: 1px solid #444; color: #fff; padding: 10px 14px; font-size: 0.9rem; font-family: 'Georgia', serif; min-width: 180px; }
+        .btn-add { padding: 10px 28px; background: #c9a84c; border: none; color: #000; font-weight: bold; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; font-size: 0.85rem; transition: background 0.3s; }
+        .btn-add:hover { background: #d4b86e; }
+
+        /* Weekly Grid */
+        .week-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 15px; margin-bottom: 30px; }
+        .day-col { background: #0a0a0a; border: 1px solid #1a1a1a; padding: 15px; min-height: 200px; }
+        .day-col h4 { font-size: 0.8rem; letter-spacing: 3px; text-transform: uppercase; color: #c9a84c; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #1a1a1a; text-align: center; }
+        .day-calories { text-align: center; font-size: 0.75rem; color: #888; margin-bottom: 10px; }
+        .day-calories span { color: #c9a84c; }
+        .meal-item { background: #111; border-left: 2px solid #c9a84c; padding: 8px 10px; margin-bottom: 8px; font-size: 0.78rem; display: flex; justify-content: space-between; align-items: center; gap: 5px; }
+        .meal-item .meal-name { color: #ccc; flex: 1; }
+        .meal-item .meal-cal { color: #888; font-size: 0.72rem; white-space: nowrap; }
+        .remove-btn { background: none; border: none; color: #555; cursor: pointer; font-size: 0.9rem; padding: 0 2px; transition: color 0.2s; }
+        .remove-btn:hover { color: #e53935; }
+        .empty-day { color: #333; font-size: 0.75rem; text-align: center; margin-top: 20px; letter-spacing: 1px; }
+
+        .clear-btn { display: inline-block; padding: 10px 28px; border: 1px solid #444; color: #888; background: none; cursor: pointer; font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase; transition: all 0.3s; }
+        .clear-btn:hover { border-color: #e53935; color: #e53935; }
+
+        footer { text-align: center; padding: 30px; border-top: 1px solid #222; color: #555; font-size: 0.8rem; letter-spacing: 1px; margin-top: 40px; }
+
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #111; border-top: 1px solid #333; display: flex; justify-content: space-around; align-items: center; padding: 12px 0; z-index: 999; }
+        .bottom-nav a { display: flex; flex-direction: column; align-items: center; gap: 5px; text-decoration: none; color: #777; font-size: 0.65rem; letter-spacing: 1px; text-transform: uppercase; transition: color 0.3s; }
+        .bottom-nav a:hover, .bottom-nav a.active { color: #c9a84c; }
+        .bottom-nav .icon { font-size: 1.6rem; }
+
+        @media (max-width: 900px) {
+            .container { padding: 30px 20px; }
+            .week-grid { grid-template-columns: repeat(3, 1fr); }
+            nav { padding: 15px 20px; }
+        }
+        @media (max-width: 600px) {
+            .week-grid { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <a href="/" class="logo">Chef<span>'s</span> Table</a>
+    <div class="nav-right">
+        <a href="/dashboard">Dashboard</a>
+        <a href="/veg">Recipes</a>
+        <a href="/ingredient-finder">Fridge Finder</a>
+        <a href="/">Logout</a>
+    </div>
+</nav>
+
+<div class="hero">
+    <h2>📅 Weekly Meal <span style="color:#fff;">Planner</span></h2>
+    <p>Plan your meals and track your daily calorie budget</p>
+</div>
+
+<div class="container">
+
+    <!-- Feature 2: Calorie Budget Tracker -->
+    <div class="budget-section">
+        <div class="budget-header">
+            <h3>🔥 Daily Calorie Budget</h3>
+            <div class="budget-input">
+                <label>Goal:</label>
+                <input type="number" id="calorieGoal" value="1500" min="500" max="5000" onchange="updateBudget()">
+                <label>kcal/day</label>
+            </div>
+        </div>
+        <div id="budgetDay" style="color:#888; font-size:0.85rem; margin-bottom:10px; letter-spacing:1px;">
+            Showing budget for: <span style="color:#c9a84c;" id="selectedDayLabel">All Days</span>
+        </div>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill" style="width:0%"></div>
+        </div>
+        <div class="budget-stats">
+            <div class="budget-stat">Consumed: <span id="consumedCal">0</span> kcal</div>
+            <div class="budget-stat">Goal: <span id="goalCal">1500</span> kcal</div>
+            <div class="budget-stat">Remaining: <span id="remainingCal">1500</span> kcal</div>
+        </div>
+    </div>
+
+    <!-- Add to Plan -->
+    <div class="add-form">
+        <h3>➕ Add Recipe to Plan</h3>
+        <form method="POST" action="/meal-planner/add">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Day</label>
+                    <select name="day" required>
+                        {% for day in ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'] %}
+                        <option value="{{ day }}">{{ day }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Recipe</label>
+                    <select name="recipe_id" required>
+                        {% for recipe in recipes %}
+                        <option value="{{ recipe.id }}">{{ recipe.emoji }} {{ recipe.name }} ({{ recipe.calories }} kcal)</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" class="btn-add">Add to Plan</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Weekly Grid -->
+    <div class="week-grid" id="weekGrid">
+        {% set days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'] %}
+        {% for day in days %}
+        <div class="day-col" data-day="{{ day }}">
+            <h4>{{ day }}</h4>
+            {% set day_cals = namespace(total=0) %}
+            {% for meal in plan.get(day, []) %}
+                {% set day_cals.total = day_cals.total + meal.calories %}
+            {% endfor %}
+            <div class="day-calories" data-cals="{{ day_cals.total }}">
+                <span>{{ day_cals.total }}</span> kcal
+            </div>
+            {% if plan.get(day) %}
+                {% for meal in plan[day] %}
+                <div class="meal-item">
+                    <span class="meal-name">{{ meal.emoji }} {{ meal.name }}</span>
+                    <span class="meal-cal">{{ meal.calories }}k</span>
+                    <form method="POST" action="/meal-planner/remove" style="display:inline;">
+                        <input type="hidden" name="day" value="{{ day }}">
+                        <input type="hidden" name="recipe_id" value="{{ meal.id }}">
+                        <button type="submit" class="remove-btn" title="Remove">✕</button>
+                    </form>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-day">Empty</div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+
+    <form method="POST" action="/meal-planner/clear" style="text-align:right;">
+        <button type="submit" class="clear-btn">🗑 Clear All</button>
+    </form>
+
+</div>
+
+<footer>&copy; 2025 Chef's Table. All rights reserved.</footer>
+
+<div class="bottom-nav">
+    <a href="/dashboard"><span class="icon">🏠</span><span>Home</span></a>
+    <a href="/meal-planner" class="active"><span class="icon">📅</span><span>Planner</span></a>
+    <a href="/detect"><span class="icon">📷</span><span>Camera</span></a>
+    <a href="/ingredient-finder"><span class="icon">🥦</span><span>Fridge</span></a>
+</div>
+
+<script>
+    function updateBudget(day) {
+        const goal = parseInt(document.getElementById('calorieGoal').value) || 1500;
+        document.getElementById('goalCal').textContent = goal;
+
+        // Sum all days or selected day
+        let total = 0;
+        if (day) {
+            const col = document.querySelector(`.day-col[data-day="${day}"]`);
+            if (col) total = parseInt(col.querySelector('.day-calories').dataset.cals) || 0;
+            document.getElementById('selectedDayLabel').textContent = day;
+        } else {
+            document.querySelectorAll('.day-calories').forEach(el => {
+                total += parseInt(el.dataset.cals) || 0;
+            });
+            document.getElementById('selectedDayLabel').textContent = 'All Days';
+        }
+
+        const pct = Math.min((total / goal) * 100, 100);
+        const fill = document.getElementById('progressFill');
+        fill.style.width = pct + '%';
+        fill.className = 'progress-fill' + (total > goal ? ' over' : '');
+        document.getElementById('consumedCal').textContent = total;
+        document.getElementById('remainingCal').textContent = Math.max(goal - total, 0);
+    }
+
+    // Click day header to filter budget
+    document.querySelectorAll('.day-col h4').forEach(h => {
+        h.style.cursor = 'pointer';
+        h.title = 'Click to see this day\'s budget';
+        h.addEventListener('click', () => updateBudget(h.closest('.day-col').dataset.day));
+    });
+
+    updateBudget();
+</script>
+
+</body>
+</html>
