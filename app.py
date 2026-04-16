@@ -150,7 +150,7 @@ def index():
 
 @app.route('/dashboard')
 def dashboard():
-    return render_template('dashboard.html')
+    return render_template('dashboard.html', recipes=RECIPES)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -172,15 +172,42 @@ def register():
 def search():
     query = request.args.get('q', '').lower()
     results = []
-    
     if query:
-        results = [recipe for recipe in RECIPES if 
-                   query in recipe['name'].lower() or 
+        # Save to search history
+        history = session.get('search_history', [])
+        if query not in history:
+            history.insert(0, query)
+        session['search_history'] = history[:20]
+        results = [recipe for recipe in RECIPES if
+                   query in recipe['name'].lower() or
                    query in recipe['description'].lower() or
                    query in recipe['category'].lower() or
                    query in recipe['cuisine'].lower()]
-    
     return render_template('search_results.html', query=query, results=results)
+
+@app.route('/profile')
+def profile():
+    history = session.get('search_history', [])
+    return render_template('profile.html', history=history)
+
+@app.route('/profile/update', methods=['POST'])
+def profile_update():
+    session['profile_name'] = request.form.get('name', 'Chef')
+    session['profile_email'] = request.form.get('email', '')
+    session['profile_bio'] = request.form.get('bio', '')
+    return redirect(url_for('profile'))
+
+@app.route('/profile/settings', methods=['POST'])
+def profile_settings():
+    session['setting_notifications'] = 'notifications' in request.form
+    session['setting_calorie_goal'] = request.form.get('calorie_goal', '1500')
+    session['setting_cuisine'] = request.form.get('cuisine', 'All')
+    return redirect(url_for('profile'))
+
+@app.route('/profile/clear-history', methods=['POST'])
+def clear_history():
+    session['search_history'] = []
+    return redirect(url_for('profile'))
 
 @app.route('/detect', methods=['GET', 'POST'])
 def detect():

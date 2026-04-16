@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - Chef's Table</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #000; color: #fff; font-family: 'Georgia', serif; min-height: 100vh; padding-bottom: 80px; }
+
+        nav { display: flex; justify-content: space-between; align-items: center; padding: 20px 60px; border-bottom: 1px solid #333; }
+        .logo { font-size: 1.8rem; font-weight: bold; letter-spacing: 3px; text-transform: uppercase; text-decoration: none; color: #fff; }
+        .logo span { color: #c9a84c; }
+        .nav-right a { color: #ccc; text-decoration: none; font-size: 0.85rem; letter-spacing: 1px; text-transform: uppercase; margin-left: 30px; transition: color 0.3s; }
+        .nav-right a:hover { color: #c9a84c; }
+
+        .hero { background: radial-gradient(ellipse at center, #1a1200 0%, #000 70%); padding: 50px 20px; text-align: center; border-bottom: 1px solid #2a2000; }
+        .avatar { width: 90px; height: 90px; background: #c9a84c; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; margin: 0 auto 15px; }
+        .hero h2 { font-size: 1.8rem; letter-spacing: 4px; text-transform: uppercase; color: #c9a84c; }
+        .hero p { color: #888; font-size: 0.85rem; letter-spacing: 2px; margin-top: 5px; }
+
+        .container { max-width: 900px; margin: 0 auto; padding: 40px 60px; }
+
+        /* Tabs */
+        .tabs { display: flex; gap: 0; border-bottom: 1px solid #222; margin-bottom: 40px; }
+        .tab-btn { padding: 14px 30px; background: none; border: none; border-bottom: 3px solid transparent; color: #666; font-size: 0.85rem; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; font-family: 'Georgia', serif; transition: all 0.3s; }
+        .tab-btn.active { color: #c9a84c; border-bottom-color: #c9a84c; }
+        .tab-btn:hover { color: #c9a84c; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* Section headers */
+        .sec-header { display: flex; align-items: center; gap: 15px; margin-bottom: 25px; }
+        .sec-header h3 { font-size: 1rem; letter-spacing: 3px; text-transform: uppercase; color: #c9a84c; white-space: nowrap; }
+        .sec-header .line { flex: 1; height: 1px; background: #1a1a1a; }
+
+        /* Account Info */
+        .info-form { background: #0a0a0a; border: 1px solid #1a1a1a; padding: 30px; margin-bottom: 30px; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; color: #888; font-size: 0.78rem; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
+        .form-group input, .form-group textarea, .form-group select { width: 100%; background: #111; border: 1px solid #333; color: #fff; padding: 12px 16px; font-family: 'Georgia', serif; font-size: 0.9rem; outline: none; transition: border 0.3s; }
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color: #c9a84c; }
+        .form-group textarea { resize: vertical; height: 80px; }
+        .form-group select option { background: #111; }
+        .save-btn { padding: 10px 30px; background: #c9a84c; border: none; color: #000; font-weight: bold; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; font-size: 0.85rem; transition: background 0.3s; font-family: 'Georgia', serif; }
+        .save-btn:hover { background: #d4b86e; }
+
+        /* Stats */
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 30px; }
+        .stat-card { background: #0a0a0a; border: 1px solid #1a1a1a; padding: 20px; text-align: center; }
+        .stat-card .num { font-size: 2rem; font-weight: bold; color: #c9a84c; }
+        .stat-card .lbl { font-size: 0.72rem; color: #666; letter-spacing: 1px; text-transform: uppercase; margin-top: 5px; }
+
+        /* Search History */
+        .history-list { background: #0a0a0a; border: 1px solid #1a1a1a; padding: 20px; margin-bottom: 20px; }
+        .history-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #111; }
+        .history-item:last-child { border-bottom: none; }
+        .history-item a { color: #ccc; text-decoration: none; font-size: 0.9rem; transition: color 0.2s; }
+        .history-item a:hover { color: #c9a84c; }
+        .history-item .time { color: #444; font-size: 0.75rem; }
+        .history-icon { color: #555; margin-right: 10px; }
+        .clear-btn { padding: 8px 20px; background: transparent; border: 1px solid #444; color: #888; cursor: pointer; font-size: 0.78rem; letter-spacing: 1px; text-transform: uppercase; transition: all 0.3s; font-family: 'Georgia', serif; }
+        .clear-btn:hover { border-color: #e53935; color: #e53935; }
+        .empty-msg { color: #444; text-align: center; padding: 30px; font-size: 0.85rem; letter-spacing: 1px; }
+
+        /* Settings */
+        .setting-row { display: flex; justify-content: space-between; align-items: center; padding: 18px 0; border-bottom: 1px solid #111; }
+        .setting-row:last-child { border-bottom: none; }
+        .setting-label { font-size: 0.9rem; color: #ccc; }
+        .setting-desc { font-size: 0.75rem; color: #555; margin-top: 3px; }
+        .toggle { position: relative; width: 44px; height: 24px; }
+        .toggle input { opacity: 0; width: 0; height: 0; }
+        .toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: #333; border-radius: 24px; transition: 0.3s; }
+        .toggle-slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background: #666; border-radius: 50%; transition: 0.3s; }
+        .toggle input:checked + .toggle-slider { background: #c9a84c; }
+        .toggle input:checked + .toggle-slider:before { transform: translateX(20px); background: #000; }
+        .danger-zone { background: #0a0a0a; border: 1px solid #2a0a0a; padding: 20px 25px; margin-top: 20px; }
+        .danger-zone h4 { color: #e53935; font-size: 0.85rem; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 15px; }
+        .danger-btn { padding: 8px 20px; background: transparent; border: 1px solid #e53935; color: #e53935; cursor: pointer; font-size: 0.78rem; letter-spacing: 1px; text-transform: uppercase; transition: all 0.3s; font-family: 'Georgia', serif; }
+        .danger-btn:hover { background: #e53935; color: #fff; }
+
+        /* Bottom Nav */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #111; border-top: 1px solid #333; display: flex; justify-content: space-around; align-items: center; padding: 12px 0; z-index: 999; }
+        .bottom-nav a { display: flex; flex-direction: column; align-items: center; gap: 5px; text-decoration: none; color: #777; font-size: 0.65rem; letter-spacing: 1px; text-transform: uppercase; transition: color 0.3s; }
+        .bottom-nav a:hover, .bottom-nav a.active { color: #c9a84c; }
+        .bottom-nav .icon { font-size: 1.6rem; }
+
+        footer { text-align: center; padding: 30px; border-top: 1px solid #222; color: #555; font-size: 0.8rem; letter-spacing: 1px; margin-top: 40px; }
+
+        @media (max-width: 768px) {
+            nav { padding: 15px 20px; }
+            .container { padding: 30px 20px; }
+            .stats-grid { grid-template-columns: repeat(3, 1fr); }
+            .tab-btn { padding: 12px 15px; font-size: 0.75rem; }
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <a href="/" class="logo">Chef<span>'s</span> Table</a>
+    <div class="nav-right">
+        <a href="/dashboard">Dashboard</a>
+        <a href="/veg">Recipes</a>
+        <a href="/ingredient-finder">🥦 Fridge</a>
+        <a href="/">Logout</a>
+    </div>
+</nav>
+
+<div class="hero">
+    <div class="avatar">👨‍🍳</div>
+    <h2>{{ session.get('profile_name', 'Chef') }}</h2>
+    <p>{{ session.get('profile_email', 'chef@table.com') }}</p>
+</div>
+
+<div class="container">
+
+    <!-- Stats -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="num">{{ history|length }}</div>
+            <div class="lbl">Searches</div>
+        </div>
+        <div class="stat-card">
+            <div class="num">{{ session.get('setting_calorie_goal', '1500') }}</div>
+            <div class="lbl">Calorie Goal</div>
+        </div>
+        <div class="stat-card">
+            <div class="num">8</div>
+            <div class="lbl">Recipes</div>
+        </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+        <button class="tab-btn active" onclick="showTab('history', this)">🔍 Search History</button>
+        <button class="tab-btn" onclick="showTab('account', this)">👤 Account</button>
+        <button class="tab-btn" onclick="showTab('settings', this)">⚙️ Settings</button>
+    </div>
+
+    <!-- Tab: Search History -->
+    <div class="tab-content active" id="tab-history">
+        <div class="sec-header">
+            <h3>Recent Searches</h3>
+            <div class="line"></div>
+            {% if history %}
+            <form method="POST" action="/profile/clear-history">
+                <button type="submit" class="clear-btn">🗑 Clear All</button>
+            </form>
+            {% endif %}
+        </div>
+        <div class="history-list">
+            {% if history %}
+                {% for item in history %}
+                <div class="history-item">
+                    <div>
+                        <span class="history-icon">🔍</span>
+                        <a href="/search?q={{ item }}">{{ item }}</a>
+                    </div>
+                    <a href="/search?q={{ item }}" style="color:#c9a84c; font-size:0.78rem; letter-spacing:1px;">Search again →</a>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-msg">No search history yet. Start searching recipes!</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Tab: Account Info -->
+    <div class="tab-content" id="tab-account">
+        <div class="sec-header">
+            <h3>Account Information</h3>
+            <div class="line"></div>
+        </div>
+        <div class="info-form">
+            <form method="POST" action="/profile/update">
+                <div class="form-group">
+                    <label>Display Name</label>
+                    <input type="text" name="name" value="{{ session.get('profile_name', 'Chef') }}" placeholder="Your name">
+                </div>
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" name="email" value="{{ session.get('profile_email', '') }}" placeholder="your@email.com">
+                </div>
+                <div class="form-group">
+                    <label>Bio</label>
+                    <textarea name="bio" placeholder="Tell us about your food preferences...">{{ session.get('profile_bio', '') }}</textarea>
+                </div>
+                <button type="submit" class="save-btn">Save Changes</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Tab: Settings -->
+    <div class="tab-content" id="tab-settings">
+        <div class="sec-header">
+            <h3>Preferences</h3>
+            <div class="line"></div>
+        </div>
+        <div class="info-form">
+            <form method="POST" action="/profile/settings">
+                <div class="setting-row">
+                    <div>
+                        <div class="setting-label">Daily Calorie Goal</div>
+                        <div class="setting-desc">Used in the meal planner tracker</div>
+                    </div>
+                    <input type="number" name="calorie_goal" value="{{ session.get('setting_calorie_goal', '1500') }}" min="500" max="5000" style="width:100px; background:#111; border:1px solid #333; color:#fff; padding:8px 12px; font-family:'Georgia',serif; outline:none;">
+                </div>
+                <div class="setting-row">
+                    <div>
+                        <div class="setting-label">Favourite Cuisine</div>
+                        <div class="setting-desc">Your preferred cuisine type</div>
+                    </div>
+                    <select name="cuisine" style="background:#111; border:1px solid #333; color:#fff; padding:8px 12px; font-family:'Georgia',serif; outline:none;">
+                        {% for c in ['All', 'Indian', 'Italian', 'Asian', 'American', 'Middle Eastern', 'French', 'Japanese'] %}
+                        <option value="{{ c }}" {% if session.get('setting_cuisine', 'All') == c %}selected{% endif %}>{{ c }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="setting-row">
+                    <div>
+                        <div class="setting-label">Notifications</div>
+                        <div class="setting-desc">Meal plan reminders</div>
+                    </div>
+                    <label class="toggle">
+                        <input type="checkbox" name="notifications" {% if session.get('setting_notifications', False) %}checked{% endif %}>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                <div style="margin-top:20px;">
+                    <button type="submit" class="save-btn">Save Settings</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="danger-zone">
+            <h4>⚠️ Danger Zone</h4>
+            <form method="POST" action="/profile/clear-history" style="display:inline;">
+                <button type="submit" class="danger-btn">Clear Search History</button>
+            </form>
+            &nbsp;&nbsp;
+            <a href="/" style="padding:8px 20px; background:transparent; border:1px solid #e53935; color:#e53935; font-size:0.78rem; letter-spacing:1px; text-transform:uppercase; text-decoration:none; transition:all 0.3s;" onmouseover="this.style.background='#e53935';this.style.color='#fff'" onmouseout="this.style.background='transparent';this.style.color='#e53935'">Logout</a>
+        </div>
+    </div>
+
+</div>
+
+<footer>&copy; 2025 Chef's Table. All rights reserved.</footer>
+
+<div class="bottom-nav">
+    <a href="/dashboard"><span class="icon">🏠</span><span>Home</span></a>
+    <a href="/meal-planner"><span class="icon">📅</span><span>Planner</span></a>
+    <a href="/detect"><span class="icon">📷</span><span>Camera</span></a>
+    <a href="/profile" class="active"><span class="icon">👤</span><span>Profile</span></a>
+</div>
+
+<script>
+    function showTab(name, btn) {
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('tab-' + name).classList.add('active');
+        btn.classList.add('active');
+    }
+</script>
+
+</body>
+</html>

@@ -80,6 +80,30 @@
         .tag { display: inline-block; padding: 4px 12px; border: 1px solid #c9a84c; color: #c9a84c; font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; }
         .rating { float: right; color: #c9a84c; font-size: 0.85rem; }
 
+        /* Tools */
+        .tool-btn { padding:8px 16px; background:#111; border:1px solid #333; color:#aaa; font-size:0.78rem; letter-spacing:1px; cursor:pointer; transition:all 0.3s; font-family:'Georgia',serif; white-space:nowrap; }
+        .tool-btn:hover { border-color:#c9a84c; color:#c9a84c; }
+        .tool-btn.active { background:#c9a84c; border-color:#c9a84c; color:#000; font-weight:bold; }
+        .tool-panel { display:none; background:#050505; border-bottom:1px solid #1a1a1a; }
+        .tool-panel.open { display:block; }
+        .tool-panel-inner { padding:30px 60px; max-width:1000px; }
+        .tool-title { font-size:1.1rem; letter-spacing:3px; text-transform:uppercase; color:#c9a84c; margin-bottom:15px; }
+        .mood-btn { padding:8px 18px; background:#111; border:1px solid #333; color:#aaa; font-size:0.8rem; cursor:pointer; transition:all 0.3s; font-family:'Georgia',serif; }
+        .mood-btn:hover, .mood-btn.active { background:#c9a84c; border-color:#c9a84c; color:#000; font-weight:bold; }
+        .timer-preset { padding:8px 16px; background:#111; border:1px solid #333; color:#aaa; font-size:0.8rem; cursor:pointer; transition:all 0.3s; font-family:'Georgia',serif; }
+        .timer-preset:hover { border-color:#c9a84c; color:#c9a84c; }
+        .spice-btn { padding:8px 18px; background:#111; border:1px solid #333; color:#aaa; font-size:0.8rem; cursor:pointer; transition:all 0.3s; font-family:'Georgia',serif; }
+        .spice-btn:hover, .spice-btn.active { background:#e53935; border-color:#e53935; color:#fff; font-weight:bold; }
+        .nutr-btn { padding:8px 18px; background:#111; border:1px solid #333; color:#aaa; font-size:0.8rem; cursor:pointer; transition:all 0.3s; font-family:'Georgia',serif; }
+        .nutr-btn:hover, .nutr-btn.active { background:#4caf50; border-color:#4caf50; color:#fff; font-weight:bold; }
+        .nutr-bar-row { display:flex; align-items:center; gap:15px; margin-bottom:12px; }
+        .nutr-bar-label { width:160px; font-size:0.82rem; color:#ccc; flex-shrink:0; }
+        .nutr-bar-track { flex:1; height:10px; background:#1a1a1a; border-radius:5px; overflow:hidden; }
+        .nutr-bar-fill { height:100%; background:#4caf50; border-radius:5px; transition:width 0.5s; }
+        .nutr-bar-val { width:60px; text-align:right; font-size:0.8rem; color:#c9a84c; flex-shrink:0; }
+        .shop-item { padding:6px 14px; background:#111; border:1px solid #222; color:#ccc; font-size:0.78rem; cursor:pointer; transition:all 0.2s; }
+        .shop-item.bought { background:#0d2a0d; border-color:#4caf50; color:#4caf50; text-decoration:line-through; }
+
         /* Bottom Nav */
         .bottom-nav { display: flex; justify-content: space-around; align-items: center; background: #111; border-top: 1px solid #333; padding: 14px 0; margin-top: 20px; }
         .bottom-nav a { display: flex; flex-direction: column; align-items: center; gap: 5px; text-decoration: none; color: #777; font-size: 0.65rem; letter-spacing: 1px; text-transform: uppercase; transition: color 0.3s; }
@@ -126,7 +150,6 @@
                 <a href="#"><span class="dot-fav">★</span> Fav Recipes</a>
             </div>
         </div>
-        <a href="/meal-planner">📅 Meal Planner</a>
         <a href="/ingredient-finder">🥦 Fridge Finder</a>
         <a href="/">Logout</a>
     </div>
@@ -170,6 +193,90 @@
     <div id="catCards"></div>
 </div>
 
+<!-- Tools Bar -->
+<div style="padding:20px 60px; background:#0a0a0a; border-bottom:1px solid #1a1a1a;">
+    <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:center;">
+        <span style="color:#555; font-size:0.75rem; letter-spacing:2px; text-transform:uppercase;">Tools:</span>
+        <button onclick="toggleTool('surprise')" class="tool-btn" id="tbtn-surprise">🎲 Surprise Me</button>
+        <button onclick="toggleTool('shopping')" class="tool-btn" id="tbtn-shopping">🛒 Shopping List</button>
+        <button onclick="toggleTool('spice')" class="tool-btn" id="tbtn-spice">🌶️ Spice Filter</button>
+        <button onclick="toggleTool('nutrition')" class="tool-btn" id="tbtn-nutrition">📊 Nutrition Chart</button>
+    </div>
+</div>
+
+<!-- Tool Panels (hidden by default) -->
+
+<!-- 1. Surprise Me -->
+<div class="tool-panel" id="tool-surprise">
+    <div class="tool-panel-inner">
+        <div class="tool-title">🎲 Surprise Me</div>
+        <p style="color:#888; font-size:0.85rem; margin-bottom:20px;">Pick a mood and get a random recipe!</p>
+        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:25px;">
+            <button onclick="surpriseMe('all')" class="mood-btn active" id="mood-all">🍽️ Any</button>
+            <button onclick="surpriseMe('healthy')" class="mood-btn" id="mood-healthy">🥗 Healthy</button>
+            <button onclick="surpriseMe('dessert')" class="mood-btn" id="mood-dessert">🍰 Dessert</button>
+            <button onclick="surpriseMe('indian')" class="mood-btn" id="mood-indian">🇮🇳 Indian</button>
+            <button onclick="surpriseMe('italian')" class="mood-btn" id="mood-italian">🇮🇹 Italian</button>
+        </div>
+        <div id="surpriseResult"></div>
+    </div>
+</div>
+
+<!-- 4. Shopping List -->
+<div class="tool-panel" id="tool-shopping">
+    <div class="tool-panel-inner">
+        <div class="tool-title">🛒 Shopping List</div>
+        <p style="color:#888; font-size:0.85rem; margin-bottom:20px;">Select recipes to generate a combined ingredient list</p>
+        <div style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:20px;">
+            {% for r in recipes %}
+            <label style="display:flex; align-items:center; gap:8px; background:#111; border:1px solid #222; padding:8px 14px; cursor:pointer; transition:border 0.2s;" onmouseover="this.style.borderColor='#c9a84c'" onmouseout="this.style.borderColor='#222'">
+                <input type="checkbox" value="{{ r.id }}" onchange="updateShoppingList()" style="accent-color:#c9a84c;">
+                <span style="font-size:1.2rem;">{{ r.emoji }}</span>
+                <span style="font-size:0.82rem; color:#ccc;">{{ r.name }}</span>
+            </label>
+            {% endfor %}
+        </div>
+        <div id="shoppingResult" style="display:none;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                <span style="color:#c9a84c; font-size:0.85rem; letter-spacing:2px; text-transform:uppercase;">Ingredients Needed</span>
+                <button onclick="copyList()" style="padding:6px 16px; background:transparent; border:1px solid #c9a84c; color:#c9a84c; cursor:pointer; font-size:0.75rem; letter-spacing:1px; font-family:'Georgia',serif;">📋 Copy</button>
+            </div>
+            <div id="shoppingItems" style="display:flex; flex-wrap:wrap; gap:8px;"></div>
+        </div>
+    </div>
+</div>
+
+<!-- 5. Spice Filter -->
+<div class="tool-panel" id="tool-spice">
+    <div class="tool-panel-inner">
+        <div class="tool-title">🌶️ Spice Level Filter</div>
+        <p style="color:#888; font-size:0.85rem; margin-bottom:20px;">Filter recipes by how spicy you want it</p>
+        <div style="display:flex; gap:12px; flex-wrap:wrap; margin-bottom:25px;">
+            <button onclick="filterSpice('all')" class="spice-btn active" id="sp-all">🍽️ All</button>
+            <button onclick="filterSpice('mild')" class="spice-btn" id="sp-mild">😊 Mild</button>
+            <button onclick="filterSpice('medium')" class="spice-btn" id="sp-medium">🌶️ Medium</button>
+            <button onclick="filterSpice('spicy')" class="spice-btn" id="sp-spicy">🌶️🌶️ Spicy</button>
+            <button onclick="filterSpice('hot')" class="spice-btn" id="sp-hot">🌶️🌶️🌶️ Extra Hot</button>
+        </div>
+        <div id="spiceResults" style="display:flex; flex-wrap:wrap; gap:20px;"></div>
+    </div>
+</div>
+
+<!-- 6. Nutrition Chart -->
+<div class="tool-panel" id="tool-nutrition">
+    <div class="tool-panel-inner">
+        <div class="tool-title">📊 Nutrition Chart</div>
+        <p style="color:#888; font-size:0.85rem; margin-bottom:20px;">Compare nutrition across recipes</p>
+        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:20px;">
+            <button onclick="showNutrition('calories')" class="nutr-btn active" id="nb-calories">🔥 Calories</button>
+            <button onclick="showNutrition('protein')" class="nutr-btn" id="nb-protein">🥩 Protein</button>
+            <button onclick="showNutrition('carbs')" class="nutr-btn" id="nb-carbs">🍞 Carbs</button>
+            <button onclick="showNutrition('fat')" class="nutr-btn" id="nb-fat">🧈 Fat</button>
+        </div>
+        <div id="nutritionBars"></div>
+    </div>
+</div>
+
 <!-- Recommended Section -->
 <section class="recommended">
     <div class="section-header">
@@ -193,6 +300,7 @@
     <a href="/meal-planner"><span class="icon">📅</span><span>Planner</span></a>
     <a href="/detect"><span class="icon">📷</span><span>Camera</span></a>
     <a href="/ingredient-finder"><span class="icon">🥦</span><span>Fridge</span></a>
+    <a href="/profile"><span class="icon">👤</span><span>Profile</span></a>
 </div>
 
 <footer>&copy; 2025 Chef's Table. All rights reserved.</footer>
@@ -273,6 +381,100 @@ function filterByCategory(cat) {
     cards.innerHTML = matches.length ? matches.map(makeCard).join('') : '<p style="color:#555;">No recipes found.</p>';
     box.style.display = 'block';
     box.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ---- TOOLS ----
+const SPICE = {1:'mild',2:'mild',3:'mild',4:'medium',5:'spicy',6:'medium',7:'spicy',8:'mild',9:'mild',10:'mild',11:'spicy',12:'hot',13:'mild'};
+const NUTRITION_DATA = {1:{protein:6,carbs:12,fat:8,fiber:3},2:{protein:12,carbs:35,fat:10,fiber:2},3:{protein:6,carbs:52,fat:22,fiber:2},4:{protein:8,carbs:38,fat:5,fiber:4},5:{protein:18,carbs:14,fat:24,fiber:3},6:{protein:12,carbs:40,fat:10,fiber:6},7:{protein:11,carbs:28,fat:3,fiber:8},8:{protein:15,carbs:42,fat:14,fiber:5}};
+
+function toggleTool(name) {
+    const panel = document.getElementById('tool-' + name);
+    const btn = document.getElementById('tbtn-' + name);
+    const isOpen = panel.classList.contains('open');
+    document.querySelectorAll('.tool-panel').forEach(p => p.classList.remove('open'));
+    document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+    if (!isOpen) {
+        panel.classList.add('open');
+        btn.classList.add('active');
+        panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        if (name === 'nutrition') showNutrition('calories');
+        if (name === 'spice') filterSpice('all');
+        if (name === 'surprise') surpriseMe('all');
+    }
+}
+
+// 1. Surprise Me
+function surpriseMe(mood) {
+    document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('mood-' + mood).classList.add('active');
+    let pool = ALL_RECIPES;
+    if (mood === 'healthy') pool = ALL_RECIPES.filter(r => r.calories < 250);
+    else if (mood === 'dessert') pool = ALL_RECIPES.filter(r => r.category === 'Dessert');
+    else if (mood === 'indian') pool = ALL_RECIPES.filter(r => r.cuisine === 'Indian');
+    else if (mood === 'italian') pool = ALL_RECIPES.filter(r => r.cuisine === 'Italian');
+    const r = pool[Math.floor(Math.random() * pool.length)];
+    document.getElementById('surpriseResult').innerHTML = makeCard(r);
+}
+
+// 4. Shopping List
+const RECIPE_INGS = {
+    1:['Romaine Lettuce','Caesar Dressing','Croutons','Parmesan Cheese','Lemon Juice'],
+    2:['Pizza Dough','Tomato Sauce','Fresh Mozzarella','Basil','Olive Oil'],
+    3:['Dark Chocolate','Butter','Eggs','Sugar','Flour','Vanilla Extract'],
+    4:['Noodles','Broccoli','Carrots','Bell Peppers','Soy Sauce','Sesame Oil'],
+    5:['Paneer','Tomato Sauce','Butter','Cream','Onions','Spices','Ginger-Garlic'],
+    6:['Chickpeas','Tahini','Hummus','Lettuce','Tomato','Wrap Bread','Spices'],
+    7:['Yellow Lentils','Cumin','Garlic','Ginger','Onions','Tomato','Spices'],
+    8:['Plant-based Patty','Burger Bun','Lettuce','Tomato','Cheese','Special Sauce','Onion']
+};
+function updateShoppingList() {
+    const checked = [...document.querySelectorAll('#tool-shopping input[type=checkbox]:checked')].map(c => parseInt(c.value));
+    const result = document.getElementById('shoppingResult');
+    const items = document.getElementById('shoppingItems');
+    if (checked.length === 0) { result.style.display = 'none'; return; }
+    const allIngs = [...new Set(checked.flatMap(id => RECIPE_INGS[id] || []))];
+    items.innerHTML = allIngs.map(ing => `<span class="shop-item" onclick="this.classList.toggle('bought')">${ing}</span>`).join('');
+    result.style.display = 'block';
+}
+function copyList() {
+    const items = [...document.querySelectorAll('.shop-item:not(.bought)')].map(i => '• ' + i.textContent).join('\n');
+    navigator.clipboard.writeText(items).then(() => alert('Shopping list copied!'));
+}
+
+// 5. Spice Filter
+function filterSpice(level) {
+    document.querySelectorAll('.spice-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('sp-' + level).classList.add('active');
+    let pool = level === 'all' ? ALL_RECIPES : ALL_RECIPES.filter(r => SPICE[r.id] === level);
+    document.getElementById('spiceResults').innerHTML = pool.length ? pool.map(r => {
+        const chilis = {mild:'🌶️', medium:'🌶️🌶️', spicy:'🌶️🌶️🌶️', hot:'🌶️🌶️🌶️🌶️'}[SPICE[r.id]] || '🌿';
+        return `<a href="/recipe/${r.id}" style="text-decoration:none; background:#111; border:1px solid #222; width:calc(25% - 15px); min-width:180px; display:block; transition:border 0.3s;" onmouseover="this.style.borderColor='#e53935'" onmouseout="this.style.borderColor='#222'">
+            <div style="font-size:3rem; text-align:center; padding:20px; background:#1a1a1a;">${r.emoji}</div>
+            <div style="padding:15px;">
+                <div style="font-size:0.9rem; letter-spacing:2px; text-transform:uppercase; color:#fff; margin-bottom:6px;">${r.name}</div>
+                <div style="font-size:1rem; margin-bottom:8px;">${chilis}</div>
+                <div style="font-size:0.75rem; color:#777;">${r.description.substring(0,55)}...</div>
+            </div>
+        </a>`;
+    }).join('') : '<p style="color:#555;">No recipes found.</p>';
+}
+
+// 6. Nutrition Chart
+function showNutrition(type) {
+    document.querySelectorAll('.nutr-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('nb-' + type).classList.add('active');
+    const data = ALL_RECIPES.filter(r => NUTRITION_DATA[r.id]).map(r => ({
+        name: r.name, emoji: r.emoji,
+        val: type === 'calories' ? r.calories : (NUTRITION_DATA[r.id][type] || 0)
+    })).sort((a,b) => b.val - a.val);
+    const max = Math.max(...data.map(d => d.val));
+    const unit = type === 'calories' ? 'kcal' : 'g';
+    document.getElementById('nutritionBars').innerHTML = data.map(d => `
+        <div class="nutr-bar-row">
+            <div class="nutr-bar-label">${d.emoji} ${d.name}</div>
+            <div class="nutr-bar-track"><div class="nutr-bar-fill" style="width:${(d.val/max*100).toFixed(0)}%"></div></div>
+            <div class="nutr-bar-val">${d.val} ${unit}</div>
+        </div>`).join('');
 }
 
 // Nav toggle
